@@ -22,7 +22,8 @@
       "extensions": [
         "ms-python.python",
         "ms-azuretools.vscode-docker",
-        "ms-python.black-formatter"
+        "ms-python.black-formatter",
+        "artdiniz.quitcontrol-vscode"
       ]
     }
   },

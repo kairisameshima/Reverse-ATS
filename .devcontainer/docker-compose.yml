@@ -22,14 +22,22 @@ services:
     image: postgres:latest
     restart: unless-stopped
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - local_db:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: local_db
       POSTGRES_PASSWORD: postgres
 
-    # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
-    # (Adding the "ports" property to this file will not forward from a Codespace.)
+  db_test:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - local_test_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: local_test_db
+      POSTGRES_PASSWORD: postgres
 
 volumes:
-  postgres-data:
+  local_db:
+  local_test_db:
