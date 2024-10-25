@@ -24,7 +24,8 @@
       ]
     }
   },
-  "postCreateCommand": "pip install --no-cache-dir -r requirements.txt"
+  "postCreateCommand": "pip install --no-cache-dir -r requirements.txt",
+  "postStartCommand": "flask run --host=0.0.0.0"
 
   // Use 'postCreateCommand' to run commands after the container is created.
   // "postCreateCommand": "pip install --user -r requirements.txt",
