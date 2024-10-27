@@ -5,7 +5,7 @@ application_bp = Blueprint("application", __name__)
 
 
 @application_bp.route("/all", methods=["GET"])
-def profile():
+def get_all_applications():
     db = current_app.extensions["sqlalchemy"].db
 
     application_repo = ApplicationRepo(session=db.session)
