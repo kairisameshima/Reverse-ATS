@@ -9,11 +9,10 @@ def app():
     """Create and configure a new app instance for each session."""
     app = create_app(testing=True)  # Use the test configuration
     with app.app_context():
-        db.create_all()  # Create tables in the test database
-        upgrade()
-
+        db.drop_all()  # Drop all tables to ensure a clean state
+        db.create_all()  # Recreate all tables
         yield app
-        db.drop_all()  # Drop tables after tests complete
+        db.drop_all()  # Drop tables after the session ends
 
 
 @pytest.fixture(scope="function")
