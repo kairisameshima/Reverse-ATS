@@ -1,37 +1,63 @@
-from db.tables.application import Application  # Import the model
-from app import db
+from db.tables.application import Application as ApplicationTable  # Import the model
+from ..domain_models import Application
+import sqlalchemy as sa
+from typing import Optional
+from uuid import UUID
+from app.lib.exceptions import RecordNotFoundError
 
 
 class ApplicationRepo:
-    @staticmethod
-    def get_application_by_uuid(uuid):
+    def __init__(self, session):
+        self.session = session
+
+    def get(self, uuid: UUID) -> Application:
         """Fetch an application by its UUID."""
-        return db.session.query(Application).filter_by(uuid=uuid).first()
+        application = self.session.query(ApplicationTable).filter_by(uuid=uuid).first()
+        if not application:
+            raise RecordNotFoundError(uuid, ApplicationTable)
+        return self._model_from_row(application)
 
-    @staticmethod
-    def add_application(application: Application):
+    def list(self, uuids: Optional[list[UUID]] = None) -> list[Application]:
+        """Fetch all applications."""
+        return [
+            self._model_from_row(application)
+            for application in self.session.query(ApplicationTable).all()
+        ]
+
+    def add(self, application: Application) -> UUID:
         """Add a new application with the given note."""
-        db.session.add(application)
-        db.session.commit()
-        return application
+        new_record = ApplicationTable(
+            uuid=application.uuid,
+            note=application.note,
+        )
+        self.session.add(new_record)
+        self.session.commit()
+        return application.uuid
 
-    @staticmethod
-    def update_application(uuid, **kwargs):
+    def update(self, uuid, **kwargs):
         """Update fields of an existing application based on keyword arguments."""
-        application = db.session.query(Application).filter_by(uuid=uuid).first()
+        application = self.session.query(ApplicationTable).filter_by(uuid=uuid).first()
         if application:
             # Update only the fields that are provided in kwargs
             for key, value in kwargs.items():
                 if hasattr(application, key):
                     setattr(application, key, value)
-            db.session.commit()
+            self.session.commit()
+        return application
+
+    def delete(self, uuid):
+        """Delete an application by its UUID."""
+        application = self.session.query(ApplicationTable).filter_by(uuid=uuid).first()
+        if application:
+            self.session.delete(application)
+            self.session.commit()
         return application
 
     @staticmethod
-    def delete_application(uuid):
-        """Delete an application by its UUID."""
-        application = db.session.query(Application).filter_by(uuid=uuid).first()
-        if application:
-            db.session.delete(application)
-            db.session.commit()
-        return application
+    def _model_from_row(row: sa.engine.Row) -> Application:
+        return Application(
+            uuid=row.uuid,
+            note=row.note,
+            create_date=row.create_date,
+            update_date=row.update_date,
+        )

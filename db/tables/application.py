@@ -1,10 +1,10 @@
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-from ..base import Base
+from ..base import BaseTable
 
 
-class Application(Base):
+class Application(BaseTable):
     __tablename__ = "applications"
 
     uuid = Column(
