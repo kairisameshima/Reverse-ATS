@@ -1,5 +1,6 @@
 import pytest
 from app import create_app, db
+from flask_migrate import upgrade
 from db.tables.application import Application  # Import any models to create the tables
 
 
@@ -9,6 +10,8 @@ def app():
     app = create_app(testing=True)  # Use the test configuration
     with app.app_context():
         db.create_all()  # Create tables in the test database
+        upgrade()
+
         yield app
         db.drop_all()  # Drop tables after tests complete
 
