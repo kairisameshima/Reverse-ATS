@@ -2,15 +2,11 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from .config import Config, TestingConfig
+from app.application import application_bp
+from app.extensions import db
 
 
-db = SQLAlchemy()
-migrate = Migrate(db)
-
-
-# Import and register the blueprint
-from app.routes import main
-from db.tables import *
+migrate = Migrate()
 
 
 def create_app(testing=False):
@@ -19,11 +15,17 @@ def create_app(testing=False):
         app.config.from_object(TestingConfig)
     else:
         app.config.from_object(Config)
+
     db.init_app(app)
+    migrate.init_app(app, db)
+
+    from app.routes import main
 
     app.register_blueprint(main)
+    app.register_blueprint(application_bp, url_prefix="/application")
+
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    migrate.init_app(app, db)
+
     return app
 
 

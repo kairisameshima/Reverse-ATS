@@ -1,13 +1,10 @@
 from sqlalchemy import Column, String
-from sqlalchemy.orm import declarative_base
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
-from app import db
-
-Base = declarative_base()
+from ..base import Base
 
 
-class Application(db.Model, Base):
+class Application(Base):
     __tablename__ = "applications"
 
     uuid = Column(
