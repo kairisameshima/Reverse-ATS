@@ -1,7 +1,5 @@
 import pytest
 from app import create_app, db
-from flask_migrate import upgrade
-from db.tables.application import Application  # Import any models to create the tables
 
 
 @pytest.fixture(scope="session")
