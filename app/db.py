@@ -1,10 +1,12 @@
-from datetime import datetime
+import enum
 import os
-
-from sqlalchemy import Column, DateTime, String, create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from sqlalchemy.dialects.postgresql import UUID
 import uuid
+from datetime import datetime
+
+from sqlalchemy import (Column, DateTime, Enum, ForeignKey, String,
+                        create_engine)
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
 # Load database URL from environment variables
 DATABASE_URL = os.getenv(
@@ -30,6 +32,51 @@ class User(BaseTable):
     name = Column(String)
     email = Column(String, primary_key=True, unique=True)
     image_url = Column(String, nullable=True)
+    applications = relationship("Application", back_populates="user")
+
+
+class ApplicationStatusEnum(str, enum.Enum):
+    PROSPECT = "prospect"
+    APPLIED = "applied"
+    INTERVIEWING = "interviewing"
+    OFFERED = "offered"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+
+
+class ApplicationStageStatus(str, enum.Enum):
+    SCHEDULED = "scheduled"
+    COMPLETED = "completed"
+    REJECTED = "rejected"
+    PENDING = "pending"
+
+
+class ApplicationStage(BaseTable):
+    __tablename__ = "application_stages"
+    application_uuid = Column(UUID(as_uuid=True), ForeignKey(
+        'applications.uuid'), nullable=False)
+    name = Column(String)
+    status = Column(Enum(ApplicationStageStatus),
+                    default=ApplicationStageStatus.PENDING)
+    date_scheduled = Column(DateTime, nullable=True)
+    date_occurred = Column(DateTime, nullable=True)
+    notes = Column(String, nullable=True)
+
+
+class Application(BaseTable):
+    __tablename__ = "applications"
+    name = Column(String, unique=True)
+    description = Column(String)
+    user_uuid = Column(UUID(as_uuid=True), ForeignKey('users.uuid'), nullable=False)
+    position = Column(String)
+    status = Column(Enum(ApplicationStatusEnum), default=ApplicationStatusEnum.PROSPECT)
+    date_applied = Column(DateTime, nullable=True)
+    date_first_response = Column(DateTime, nullable=True)
+    date_rejected = Column(DateTime, nullable=True)
+    stages = relationship("ApplicationStage", backref="application",
+                          cascade="all, delete-orphan")
+
+    user = relationship("User", back_populates="applications")
 
 
 # Create the database tables
@@ -46,28 +93,3 @@ def get_db():
         yield db
     finally:
         db.close()
-
-
-# Helper functions to interact with the database
-
-
-# def get_user_by_id(db_session, user_id):
-#     return db_session.query(User).filter(User.id == user_id).first()
-
-
-# def get_users(db_session):
-#     return db_session.query(User).all()
-
-
-# def add_user(db_session, user_data):
-#     user = User(**user_data)
-#     db_session.add(user)
-#     db_session.commit()
-
-
-# def update_user(db_session, user_id, updated_data):
-#     user = get_user_by_id(db_session, user_id)
-#     if user:
-#         for key, value in updated_data.items():
-#             setattr(user, key, value)
-#         db_session.commit()
