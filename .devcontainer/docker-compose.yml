@@ -14,9 +14,9 @@ services:
 
     # Overrides default command so things don't shut down after the process ends.
     working_dir: /workspaces/reverse-ats
-    
-    # command: sleep infinity
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 # Start the FastAPI server
+
+    command: sleep infinity
+    # command: uvicorn app.main:app --host 0.0.0.0 --port 8000 # Start the FastAPI server
 
     # Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     network_mode: service:db
@@ -31,8 +31,22 @@ services:
       - postgres-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: local_db
       POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+  test_db:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - postgres-test-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: test_db
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
 
   frontend:
     build:
@@ -41,9 +55,10 @@ services:
       - ./frontend:/app
     ports:
       - "3000:3000"
-    command: npm start
+    command: npm run dev
     environment:
       - CHOKIDAR_USEPOLLING=true
 
 volumes:
   postgres-data:
+  postgres-test-data:
