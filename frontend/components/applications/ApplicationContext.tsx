@@ -12,7 +12,7 @@ type Stage = {
 }
 
 type Application = {
-  id: number
+  uuid: string
   company: string
   position: string
   status: "prospect" | "applied" | "interviewing" | "offered" | "accepted" | "rejected"

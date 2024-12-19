@@ -35,7 +35,7 @@ class User(BaseTable):
     applications = relationship("Application", back_populates="user")
 
 
-class ApplicationStatusEnum(str, enum.Enum):
+class ApplicationStatus(str, enum.Enum):
     PROSPECT = "prospect"
     APPLIED = "applied"
     INTERVIEWING = "interviewing"
@@ -69,7 +69,7 @@ class Application(BaseTable):
     description = Column(String)
     user_uuid = Column(UUID(as_uuid=True), ForeignKey('users.uuid'), nullable=False)
     position = Column(String)
-    status = Column(Enum(ApplicationStatusEnum), default=ApplicationStatusEnum.PROSPECT)
+    status = Column(Enum(ApplicationStatus), default=ApplicationStatus.PROSPECT)
     date_applied = Column(DateTime, nullable=True)
     date_first_response = Column(DateTime, nullable=True)
     date_rejected = Column(DateTime, nullable=True)

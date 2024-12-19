@@ -1,9 +1,12 @@
 // components/GoogleLoginButton.tsx
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { GoogleLogin } from '@react-oauth/google';
 
 const GoogleLoginButton = () => {
+  const router = useRouter();
+  
   const handleLogin = (response) => {
     console.log(response);
     // Send the response credential to your backend for verification and user creation
@@ -12,7 +15,14 @@ const GoogleLoginButton = () => {
       headers: { 'Content-Type': 'application/json' },
     })
       .then((res) => res.json())
-      .then((data) => console.log(data));
+      .then((data) => {
+        console.log(data);
+        // Redirect to /applications after successful login
+        router.push('/applications');
+      })
+      .catch((error) => {
+        console.error('Error during login:', error);
+      });
   };
 
   return (

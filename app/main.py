@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from starlette.config import Config
 from starlette.middleware.sessions import SessionMiddleware
 
+from app.applications.routes import router as applications_router
 from app.db import get_db, init_db
 from app.users.data_models import UserFromEndPoint
 from app.users.service import UserService
@@ -25,6 +26,11 @@ app = FastAPI()
 config = Config(".env")
 oauth = OAuth(config)
 
+# Add session middleware
+app.add_middleware(SessionMiddleware, secret_key=os.getenv(
+    "SECRET_KEY"), max_age=3600, https_only=False, same_site="lax")
+
+
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
@@ -34,8 +40,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Add session middleware
-app.add_middleware(SessionMiddleware, secret_key=os.getenv("SECRET_KEY"))
 
 # Set up the Google OAuth provider
 oauth.register(
@@ -110,6 +114,29 @@ async def auth_callback(request: Request, session: Session = Depends(get_db)):
         user_from_endpoint
     )
 
+    session.commit()
+
     # Store the user's UUID in the session
-    request.session["user"] = str(user_uuid)
-    return RedirectResponse(url="/applications")
+    request.session["user_uuid"] = str(user_uuid)
+    print(request.session)
+    return
+
+
+@app.get("/applications")
+async def get_applications(request: Request, session: Session = Depends(get_db)):
+    user_uuid = request.session.get("user_uuid")
+    request.session['test'] = 'test'
+    print(f"User UUID: {request.session}")
+    # application_data_filters = ApplicationDataFilters(session)
+    # application_uuids = application_data_filters.get_application_uuids_for_user(
+    #     user_uuid=user_uuid
+    # )
+
+    # application_repository = ApplicationRepository(session)
+    # applications = application_repository.list(uuids=application_uuids)
+
+    # return applications
+    return []
+
+
+app.include_router(applications_router)
