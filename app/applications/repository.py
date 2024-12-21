@@ -31,7 +31,7 @@ class ApplicationRepository(RepositoryInterface[Application]):
     def add(self, entity: Application) -> UUID:
         query = sa.insert(ApplicationTable).values(
             uuid=entity.uuid,
-            company=entity.company_name,
+            company=entity.company,
             description=entity.description,
             user_uuid=entity.user_uuid,
             position=entity.position,

@@ -13,22 +13,25 @@ type Stage = {
 
 type Application = {
   uuid: string
+  create_date: string
+  update_date: string
   company: string
+  description: string | null
+  user_uuid: string
   position: string
   status: "prospect" | "applied" | "interviewing" | "offered" | "accepted" | "rejected"
-  dateApplied: string
-  dateFirstResponse: string
-  dateRejected: string
-  stages: Stage[]
-  lastUpdated: string
+  date_applied: string
+  date_first_response: string | null
+  date_rejected: string | null
+  stages?: Stage[] // We'll keep this optional for now
 }
 
 type ApplicationContextType = {
   applications: Application[]
-  addApplication: (newApp: Omit<Application, 'id' | 'stages' | 'lastUpdated' | 'dateFirstResponse' | 'dateRejected'>) => Promise<void>
-  updateApplicationStatus: (id: number, status: Application['status']) => Promise<void>
-  updateStage: (applicationId: number, stageName: string, updates: Partial<Stage>) => Promise<void>
-  deleteApplication: (id: number) => Promise<void>
+  addApplication: (newApp: Omit<Application, 'uuid' | 'create_date' | 'update_date' | 'user_uuid' | 'stages'>) => Promise<void>
+  updateApplicationStatus: (uuid: string, status: Application['status']) => Promise<void>
+  updateStage: (applicationUuid: string, stageName: string, updates: Partial<Stage>) => Promise<void>
+  deleteApplication: (uuid: string) => Promise<void>
   shouldFollowUp: (app: Application) => boolean
   prepareChartData: () => { date: string; [key: string]: number }[]
 }
@@ -62,7 +65,7 @@ export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }
 
-  const addApplication = async (newApp: Omit<Application, 'id' | 'stages' | 'lastUpdated' | 'dateFirstResponse' | 'dateRejected'>) => {
+  const addApplication = async (newApp: Omit<Application, 'uuid' | 'create_date' | 'update_date' | 'user_uuid' | 'stages'>) => {
     try {
       const authToken = document.cookie.split('; ').find(row => row.startsWith('authToken=')).split('=')[1]
       const response = await fetch(API_URL, {
@@ -82,9 +85,9 @@ export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }
 
-  const updateApplicationStatus = async (id: number, status: Application["status"]) => {
+  const updateApplicationStatus = async (uuid: string, status: Application["status"]) => {
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
+      const response = await fetch(`${API_URL}/${uuid}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -100,9 +103,9 @@ export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }
 
-  const updateStage = async (applicationId: number, stageName: string, updates: Partial<Stage>) => {
+  const updateStage = async (applicationUuid: string, stageName: string, updates: Partial<Stage>) => {
     try {
-      const response = await fetch(`${API_URL}/${applicationId}/stages/${stageName}`, {
+      const response = await fetch(`${API_URL}/${applicationUuid}/stages/${stageName}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -118,9 +121,9 @@ export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     }
   }
 
-  const deleteApplication = async (id: number) => {
+  const deleteApplication = async (uuid: string) => {
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
+      const response = await fetch(`${API_URL}/${uuid}`, {
         method: 'DELETE',
       })
       if (!response.ok) {
@@ -133,18 +136,18 @@ export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ c
   }
 
   const shouldFollowUp = (app: Application) => {
-    const lastUpdate = new Date(app.lastUpdated)
+    const lastUpdate = new Date(app.update_date)
     return differenceInDays(new Date(), lastUpdate) >= 5
   }
 
   const prepareChartData = () => {
     const data: { [key: string]: { [key: string]: number } } = {}
     applications.forEach(app => {
-      const appliedDate = format(parseISO(app.dateApplied), 'yyyy-MM-dd')
+      const appliedDate = format(parseISO(app.date_applied), 'yyyy-MM-dd')
       if (!data[appliedDate]) {
         data[appliedDate] = {}
       }
-      app.stages.forEach(stage => {
+      app.stages?.forEach(stage => {
         if (stage.occurredDate) {
           const stageName = stage.name.replace(/\s+/g, '')
           data[appliedDate][stageName] = (data[appliedDate][stageName] || 0) + 1
