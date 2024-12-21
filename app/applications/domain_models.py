@@ -18,8 +18,8 @@ class ApplicationStage(DomainModel):
 
 class Application(DomainModel):
     """Application domain model."""
-    name: str
-    description: str
+    company_name: str
+    description: Optional[str] = None
     user_uuid: UUID
     position: str
     status: ApplicationStatus = ApplicationStatus.PROSPECT
@@ -30,7 +30,7 @@ class Application(DomainModel):
 
 class MutableApplicationFields:
     """Fields that can be updated on a Application."""
-    name: str
+    company_name: str
     description: str
     position: str
     status: ApplicationStatus

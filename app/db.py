@@ -3,8 +3,7 @@ import os
 import uuid
 from datetime import datetime
 
-from sqlalchemy import (Column, DateTime, Enum, ForeignKey, String,
-                        create_engine)
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, String, create_engine
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker
 
@@ -65,14 +64,14 @@ class ApplicationStage(BaseTable):
 
 class Application(BaseTable):
     __tablename__ = "applications"
-    name = Column(String, unique=True)
-    description = Column(String)
-    user_uuid = Column(UUID(as_uuid=True), ForeignKey('users.uuid'), nullable=False)
+    company = Column(String, unique=True)
     position = Column(String)
+    description = Column(String, nullable=True)
     status = Column(Enum(ApplicationStatus), default=ApplicationStatus.PROSPECT)
     date_applied = Column(DateTime, nullable=True)
     date_first_response = Column(DateTime, nullable=True)
     date_rejected = Column(DateTime, nullable=True)
+    user_uuid = Column(UUID(as_uuid=True), ForeignKey('users.uuid'), nullable=False)
     stages = relationship("ApplicationStage", backref="application",
                           cascade="all, delete-orphan")
 

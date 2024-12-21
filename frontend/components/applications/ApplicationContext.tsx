@@ -1,7 +1,7 @@
 'use client'
 
-import React, { createContext, useState, useContext, useEffect } from 'react'
-import { format, differenceInDays, parseISO } from 'date-fns'
+import { differenceInDays, format, parseISO } from 'date-fns'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 
 type Stage = {
   name: string
@@ -46,7 +46,12 @@ export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const fetchApplications = async () => {
     try {
-      const response = await fetch(API_URL)
+      const authToken = document.cookie.split('; ').find(row => row.startsWith('authToken=')).split('=')[1]
+      const response = await fetch(API_URL, {
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
+      })
       if (!response.ok) {
         throw new Error('Failed to fetch applications')
       }
@@ -59,10 +64,12 @@ export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   const addApplication = async (newApp: Omit<Application, 'id' | 'stages' | 'lastUpdated' | 'dateFirstResponse' | 'dateRejected'>) => {
     try {
+      const authToken = document.cookie.split('; ').find(row => row.startsWith('authToken=')).split('=')[1]
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify(newApp),
       })

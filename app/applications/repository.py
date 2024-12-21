@@ -4,8 +4,7 @@ from uuid import UUID
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 
-from app.applications.domain_models import (Application,
-                                            MutableApplicationFields)
+from app.applications.domain_models import Application, MutableApplicationFields
 from app.db import Application as ApplicationTable
 from app.lib.data_access.interface import RepositoryInterface
 
@@ -32,7 +31,7 @@ class ApplicationRepository(RepositoryInterface[Application]):
     def add(self, entity: Application) -> UUID:
         query = sa.insert(ApplicationTable).values(
             uuid=entity.uuid,
-            name=entity.name,
+            company=entity.company_name,
             description=entity.description,
             user_uuid=entity.user_uuid,
             position=entity.position,

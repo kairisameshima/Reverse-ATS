@@ -17,6 +17,8 @@ const GoogleLoginButton = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
+        // Save the auth token to cookies
+        document.cookie = `authToken=${data.token}; path=/;`;
         // Redirect to /applications after successful login
         router.push('/applications');
       })
