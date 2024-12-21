@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@react-oauth/google": "^0.12.1",
+    "reconnecting-websocket": "^4.4.0"
+  }
+}

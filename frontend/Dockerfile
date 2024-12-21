@@ -1,5 +1,5 @@
 # frontend/Dockerfile
-FROM node:14
+FROM node:18
 WORKDIR /frontend
 
 COPY package.json ./
@@ -11,4 +11,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
