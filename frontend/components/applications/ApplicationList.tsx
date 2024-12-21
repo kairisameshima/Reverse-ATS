@@ -65,7 +65,6 @@ export default function ApplicationList({ applications, onSelectApplication }: A
                   </SelectContent>
                 </Select>
                 <Button variant="ghost" size="icon" onClick={() => {
-                  console.log('Button clicked for application:', app.uuid);
                   onSelectApplication(app.uuid);
                 }}>
                   <ChevronRight className="h-4 w-4" />

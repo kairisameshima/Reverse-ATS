@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useApplicationContext } from './ApplicationContext'
-import AddApplicationForm from './AddApplicationForm'
-import ApplicationList from './ApplicationList'
-import ApplicationDetails from './ApplicationDetails'
-import ApplicationChart from './ApplicationChart'
 import { Card, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from 'react'
+import AddApplicationForm from './AddApplicationForm'
+import ApplicationChart from './ApplicationChart'
+import { useApplicationContext } from './ApplicationContext'
+import ApplicationDetails from './ApplicationDetails'
+import ApplicationList from './ApplicationList'
 
 export default function ApplicantTrackingSystem() {
   const { applications } = useApplicationContext()
@@ -24,7 +24,7 @@ export default function ApplicantTrackingSystem() {
       </div>
       {selectedApplication !== null && (
         <ApplicationDetails
-          applicationId={selectedApplication}
+          applicationUuid={selectedApplication}
           onClose={() => setSelectedApplication(null)}
         />
       )}
