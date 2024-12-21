@@ -60,7 +60,7 @@ class ApplicationRepository(RepositoryInterface[Application]):
         pass
         return Application(
             uuid=row.uuid,
-            name=row.name,
+            company=row.company,
             description=row.description,
             user_uuid=row.user_uuid,
             position=row.position,

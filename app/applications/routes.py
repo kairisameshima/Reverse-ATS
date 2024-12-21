@@ -54,11 +54,13 @@ async def create_application(request: Request, session: Session = Depends(get_db
     new_application = application_repository.add(
         ApplicationModel(
             user_uuid=user_uuid,
-            company_name=application_data.company,
+            company=application_data.company,
             position=application_data.position,
             status=application_data.status,
             date_applied=application_data.dateApplied
         )
     )
+
+    session.commit()
 
     return new_application

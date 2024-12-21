@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from typing import Optional
 from uuid import UUID
 
@@ -11,29 +11,29 @@ class ApplicationStage(DomainModel):
     application_uuid: UUID
     name: str
     status: ApplicationStageStatus = ApplicationStageStatus.PENDING
-    date_scheduled: Optional[datetime]
-    date_occurred: Optional[datetime]
+    date_scheduled: Optional[date]
+    date_occurred: Optional[date]
     notes: Optional[str]
 
 
 class Application(DomainModel):
     """Application domain model."""
-    company_name: str
+    company: str
     description: Optional[str] = None
     user_uuid: UUID
     position: str
     status: ApplicationStatus = ApplicationStatus.PROSPECT
-    date_applied: Optional[datetime] = None
-    date_first_response: Optional[datetime] = None
-    date_rejected: Optional[datetime] = None
+    date_applied: Optional[date] = None
+    date_first_response: Optional[date] = None
+    date_rejected: Optional[date] = None
 
 
 class MutableApplicationFields:
     """Fields that can be updated on a Application."""
-    company_name: str
+    company: str
     description: str
     position: str
     status: ApplicationStatus
-    date_applied: datetime
-    date_first_response: datetime
-    date_rejected: datetime
+    date_applied: date
+    date_first_response: date
+    date_rejected: date

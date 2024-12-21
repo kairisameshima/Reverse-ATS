@@ -1,13 +1,14 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useApplicationContext } from './ApplicationContext'
 import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { ChevronRight, AlertCircle } from 'lucide-react'
-import { format } from 'date-fns'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { parse } from 'date-fns'
+import { AlertCircle, ChevronRight } from 'lucide-react'
+import { useState } from 'react'
+import { useApplicationContext } from './ApplicationContext'
+
 
 type ApplicationListProps = {
   applications: ReturnType<typeof useApplicationContext>['applications']
@@ -41,7 +42,7 @@ export default function ApplicationListComponent({ applications, onSelectApplica
               <div>
                 <h3 className="font-semibold">{app.company}</h3>
                 <p className="text-sm text-muted-foreground">{app.position}</p>
-                <p className="text-xs text-muted-foreground">Applied: {format(new Date(app.dateApplied), 'MMM dd, yyyy')}</p>
+                <p className="text-xs text-muted-foreground">Applied: {parse(app.dateApplied, "YYYY-MM-DD", new Date())}</p>
               </div>
               <div className="flex items-center space-x-2">
                 {shouldFollowUp(app) && (
